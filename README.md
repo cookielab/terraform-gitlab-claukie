@@ -6,10 +6,8 @@ Terraform module for provisioning [Claukie](https://gitlab.cookielab.io/general/
 
 For each entry in `groups_and_projects`, the module creates:
 
-- **Group service account** — a dedicated GitLab service account scoped to the specified group
-- **Service account access token** — a long-lived API token (365 days, auto-rotated 60 days before expiry) with `api` scope
-- **Project memberships** — the service account is added as a `Developer` to each listed project, granting it access to read MRs and post review comments
-- **CI/CD variable** (`CLAUKIE_GITLAB_TOKEN`) — the access token is injected into each project's CI/CD variables so pipelines can authenticate the bot
+- **Group access token** — a long-lived GitLab group-level API token (365 days, auto-rotated 60 days before expiry) with `api` scope; the token inherits the group's permissions and therefore has access to all projects within that group
+- **CI/CD variable** (`CLAUKIE_GITLAB_TOKEN`) — the access token is injected into each listed project's CI/CD variables so pipelines can authenticate the bot
 
 ## Usage
 
@@ -56,9 +54,7 @@ No modules.
 
 | Name | Type |
 | ---- | ---- |
-| [gitlab_group_service_account.this](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs/resources/group_service_account) | resource |
-| [gitlab_group_service_account_access_token.this](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs/resources/group_service_account_access_token) | resource |
-| [gitlab_project_membership.this](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs/resources/project_membership) | resource |
+| [gitlab_group_access_token.this](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs/resources/group_access_token) | resource |
 | [gitlab_project_variable.this](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs/resources/project_variable) | resource |
 | [gitlab_group.by_id](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs/data-sources/group) | data source |
 | [gitlab_group.by_path](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs/data-sources/group) | data source |

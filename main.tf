@@ -81,35 +81,18 @@ data "gitlab_project" "by_path" {
   path_with_namespace = each.value.project_path
 }
 
-resource "gitlab_group_service_account" "this" {
+resource "gitlab_group_access_token" "this" {
   for_each = local.resolved_groups
 
-  group    = each.value.id
-  name     = "claukie ${each.value.name}"
-  username = "claukie-${each.value.path}"
-}
-
-resource "gitlab_group_service_account_access_token" "this" {
-  for_each = local.resolved_groups
-
-  group   = each.value.id
-  user_id = gitlab_group_service_account.this[each.key].service_account_id
-  name    = "Claukie service account access token"
+  group        = each.value.id
+  name         = "Claukie ${each.value.name} service account access token"
+  access_level = "developer"
+  scopes       = ["api"]
 
   rotation_configuration = {
     expiration_days    = 365
     rotate_before_days = var.token_rotate_before_days
   }
-
-  scopes = ["api"]
-}
-
-resource "gitlab_project_membership" "this" {
-  for_each = local.resolved_projects
-
-  project      = each.value.project.id
-  user_id      = gitlab_group_service_account.this[each.value.group_key].service_account_id
-  access_level = "developer"
 }
 
 resource "gitlab_project_variable" "this" {
@@ -120,8 +103,8 @@ resource "gitlab_project_variable" "this" {
   masked            = true
   protected         = false
   key               = "CLAUKIE_GITLAB_TOKEN"
-  value             = gitlab_group_service_account_access_token.this[each.value.group_key].token
-  description       = "Claukie gitlab group service account access token"
+  value             = gitlab_group_access_token.this[each.value.group_key].token
+  description       = "Gitlab group access token for claukie"
   project           = each.value.project.id
   variable_type     = "env_var"
   environment_scope = "*"
